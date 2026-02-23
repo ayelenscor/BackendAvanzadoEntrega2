@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { ProductRepository } from '../dao/productRepository.js';
 import { productToDTO } from '../dao/dtos/productDTO.js';
 import { uploader } from '../utils/multerUtil.js';
+import passport from '../utils/passportUtil.js';
+import { authorizeRoles } from '../middlewares/authorize.js';
 
 const router = Router();
 const ProductService = new ProductRepository();
@@ -32,7 +34,11 @@ router.get('/:pid', async (req, res) => {
     }
 });
 
-router.post('/', uploader.array('thumbnails', 3), async (req, res) => {
+router.post('/',
+    passport.authenticate('current', { session: false }),
+    authorizeRoles('admin'),
+    uploader.array('thumbnails', 3),
+    async (req, res) => {
 
     if (req.files) {
         req.body.thumbnails = [];
@@ -55,7 +61,11 @@ router.post('/', uploader.array('thumbnails', 3), async (req, res) => {
     }
 });
 
-router.put('/:pid', uploader.array('thumbnails', 3), async (req, res) => {
+router.put('/:pid',
+    passport.authenticate('current', { session: false }),
+    authorizeRoles('admin'),
+    uploader.array('thumbnails', 3),
+    async (req, res) => {
 
     if (req.files) {
         req.body.thumbnails = [];
@@ -78,7 +88,10 @@ router.put('/:pid', uploader.array('thumbnails', 3), async (req, res) => {
     }
 });
 
-router.delete('/:pid', async (req, res) => {
+router.delete('/:pid',
+    passport.authenticate('current', { session: false }),
+    authorizeRoles('admin'),
+    async (req, res) => {
 
     try {
         const result = await ProductService.deleteProduct(req.params.pid);
