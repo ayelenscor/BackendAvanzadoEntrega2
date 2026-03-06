@@ -1,21 +1,16 @@
 import { Router } from 'express';
-import { ProductRepository } from '../dao/productRepository.js';
-import { CartRepository } from '../dao/cartRepository.js';
 import { cartToDTO } from '../dao/dtos/cartDTO.js';
-import { TicketRepository } from '../dao/ticketRepository.js';
+import { CartService } from '../services/cartService.js';
 import passport from '../utils/passportUtil.js';
 
 
 const router = Router();
-const ProductService = new ProductRepository();
-const CartService = new CartRepository(ProductService);
 
-const TicketService = new TicketRepository();
+
 
 router.get('/:cid', async (req, res) => {
-
     try {
-        const result = await CartService.getProductsFromCartByID(req.params.cid);
+        const result = await CartService.getCartById(req.params.cid);
         res.send({
             status: 'success',
             payload: cartToDTO(result)
@@ -28,8 +23,8 @@ router.get('/:cid', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
 
+router.post('/', async (req, res) => {
     try {
         const result = await CartService.createCart();
         res.send({
@@ -44,10 +39,10 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/:cid/product/:pid', async (req, res) => {
 
+router.post('/:cid/product/:pid', async (req, res) => {
     try {
-        const result = await CartService.addProductByID(req.params.cid, req.params.pid)
+        const result = await CartService.addProductToCart(req.params.cid, req.params.pid);
         res.send({
             status: 'success',
             payload: cartToDTO(result)
@@ -60,10 +55,10 @@ router.post('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-router.delete('/:cid/product/:pid', async (req, res) => {
 
+router.delete('/:cid/product/:pid', async (req, res) => {
     try {
-        const result = await CartService.deleteProductByID(req.params.cid, req.params.pid)
+        const result = await CartService.deleteProductFromCart(req.params.cid, req.params.pid);
         res.send({
             status: 'success',
             payload: cartToDTO(result)

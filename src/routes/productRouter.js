@@ -1,17 +1,15 @@
 import { Router } from 'express';
-import { ProductRepository } from '../dao/productRepository.js';
+import { ProductService } from '../services/productService.js';
 import { productToDTO } from '../dao/dtos/productDTO.js';
 import { uploader } from '../utils/multerUtil.js';
 import passport from '../utils/passportUtil.js';
 import { authorizeRoles } from '../middlewares/authorize.js';
 
 const router = Router();
-const ProductService = new ProductRepository();
 
 router.get('/', async (req, res) => {
     const result = await ProductService.getAllProducts(req.query);
     const docs = (result.docs || []).map(productToDTO);
-
     res.send({
         status: 'success',
         payload: { ...result, docs }
@@ -19,9 +17,8 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:pid', async (req, res) => {
-
     try {
-        const result = await ProductService.getProductByID(req.params.pid);
+        const result = await ProductService.getProductById(req.params.pid);
         res.send({
             status: 'success',
             payload: productToDTO(result)
@@ -39,14 +36,12 @@ router.post('/',
     authorizeRoles('admin'),
     uploader.array('thumbnails', 3),
     async (req, res) => {
-
     if (req.files) {
         req.body.thumbnails = [];
         req.files.forEach((file) => {
             req.body.thumbnails.push(file.path);
         });
     }
-
     try {
         const result = await ProductService.createProduct(req.body);
         res.send({
@@ -66,14 +61,12 @@ router.put('/:pid',
     authorizeRoles('admin'),
     uploader.array('thumbnails', 3),
     async (req, res) => {
-
     if (req.files) {
         req.body.thumbnails = [];
         req.files.forEach((file) => {
             req.body.thumbnails.push(file.filename);
         });
     }
-
     try {
         const result = await ProductService.updateProduct(req.params.pid, req.body);
         res.send({
@@ -92,7 +85,6 @@ router.delete('/:pid',
     passport.authenticate('current', { session: false }),
     authorizeRoles('admin'),
     async (req, res) => {
-
     try {
         const result = await ProductService.deleteProduct(req.params.pid);
         res.send({
