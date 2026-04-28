@@ -129,31 +129,25 @@ class CartRepository {
             }
 
             if (prod.stock >= qty) {
-                // can purchase
                 purchasable.push({ product: prod, quantity: qty, price: prod.price });
                 totalAmount += prod.price * qty;
-                // decrement stock
                 await ProductRepository.updateProduct(prod._id, { stock: prod.stock - qty });
             } else {
-                // not enough stock -> leave in cart
                 remaining.push(item);
             }
         }
 
-        // update cart with remaining products
         await cartModel.updateOne({ _id: cid }, { products: remaining });
 
         if (purchasable.length === 0) {
             return { status: 'error', message: 'No hay productos con stock suficiente' };
         }
 
-        // prepare ticket products
         const ticketProducts = purchasable.map(p => ({ product: p.product._id, quantity: p.quantity, price: p.price }));
 
         const ticketRepo = new TicketRepository();
         const ticket = await ticketRepo.createTicket({ amount: totalAmount, purchaser: purchaserEmail, products: ticketProducts });
 
-        // prepare notPurchased DTO list
         const notPurchased = remaining.map(item => ({
             product: item.product && item.product._id ? productToDTO(item.product) : { id: item.product?.toString() },
             quantity: item.quantity

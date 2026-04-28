@@ -48,7 +48,6 @@ passport.use('jwt', new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
   }
 }));
 
-// Estrategia alias 'current' para identificar al usuario actual (misma lógica que 'jwt')
 passport.use('current', new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
   try {
     const user = await User.findById(jwt_payload.id);
@@ -61,6 +60,5 @@ passport.use('current', new JwtStrategy(jwtOptions, async (jwt_payload, done) =>
   }
 }));
 
-// Not using sessions; serialize/deserialize are unnecessary.
 
 export default passport;
