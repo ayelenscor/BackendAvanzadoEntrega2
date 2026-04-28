@@ -9,6 +9,7 @@ import cartRouter from './routes/cartRouter.js';
 import viewsRouter from './routes/viewsRouter.js';
 import authRouter from './routes/authRouter.js';
 import sessionsRouter from './routes/sessionsRouter.js';
+import mocksRouter from './routes/mocksRouter.js';
 import __dirname from './utils/constantsUtil.js';
 import websocket from './websocket.js';
 import passport from './utils/passportUtil.js';
@@ -34,6 +35,7 @@ app.use('/api/products', productRouter);
 app.use('/api/carts', cartRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/sessions', sessionsRouter);
+app.use('/api/mocks', mocksRouter);
 app.use('/', viewsRouter);
 
 const PORT = 8080;
